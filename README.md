@@ -1,7 +1,6 @@
 # CI02 — Prévision de l'indice des importations de blé au Maroc
 
-Projet pédagogique illustratif préparé avec IA ; respecter la consigne de ne pas coder avant la séance d'évaluation.
-
+Projet pédagogique illustratif préparé avec IA
 ## Dossiers
 
 - `data/raw/` : CSV FAOSTAT original
