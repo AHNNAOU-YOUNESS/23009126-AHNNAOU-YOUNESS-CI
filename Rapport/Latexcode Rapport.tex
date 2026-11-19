@@ -1,0 +1,74 @@
+\documentclass[11pt,a4paper]{report}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{lmodern,microtype}
+\usepackage[a4paper,margin=2.4cm,headheight=15pt]{geometry}
+\usepackage{graphicx,booktabs,tabularx,array,float,amsmath,amssymb,xcolor,hyperref,fancyhdr,titlesec,enumitem}
+\definecolor{navy}{HTML}{183153}\definecolor{teal}{HTML}{087F8C}\definecolor{muted}{HTML}{596579}
+\hypersetup{colorlinks=true,linkcolor=navy,urlcolor=teal}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small\color{muted}ENCG Settat | S7 Commerce international}\fancyhead[R]{\small\color{muted}Projet CI02}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0.3pt}
+\titleformat{\chapter}{\normalfont\Huge\bfseries\color{navy}}{\thechapter}{1em}{}
+\titleformat{\section}{\normalfont\Large\bfseries\color{navy}}{\thesection}{0.8em}{}
+\setlength{\parskip}{5pt}\setlength{\parindent}{0pt}
+\newcommand{\figureprojet}[3]{\begin{figure}[H]\centering\includegraphics[width=0.88\textwidth,height=0.37\textheight,keepaspectratio]{figures/#1}\caption{#2}\label{fig:#1}\end{figure}\noindent\textit{Interprétation :} #3\par\medskip}
+\begin{document}
+\begin{titlepage}\centering\vspace*{1.7cm}
+{\large\color{teal}\bfseries ENCG SETTAT\\SEMESTRE 7 -- COMMERCE INTERNATIONAL\par}\vspace{1.4cm}
+{\color{navy}\rule{\linewidth}{1.5pt}}\vspace{0.65cm}
+{\Huge\bfseries Rapport de projet\\[0.3cm] Science des données\par}\vspace{0.55cm}
+{\LARGE\color{teal} CI02 -- Prévision des importations agricoles\par}\vspace{0.3cm}
+{\large Étude de l'indice de quantité importée de blé au Maroc\par}\vspace{0.7cm}{\color{navy}\rule{\linewidth}{1.5pt}}\vspace{1.5cm}
+\begin{tabular}{rl}\textbf{Étudiante :}& Hiba Hassoune\\\textbf{Code Apogée :}& 24011380\\\textbf{Groupe :}& 1\\\textbf{Enseignant :}& A. Larhlimi\\\textbf{Année universitaire :}& 2026--2027\end{tabular}
+\vfill\small\color{muted}Document préparatoire assisté par IA. Résultats illustratifs à vérifier dans le notebook exécuté.\end{titlepage}
+\tableofcontents\clearpage
+\chapter{Problématique et objectifs}
+Les importations agricoles jouent un rôle important dans l'approvisionnement du Maroc. La prévision de leurs fluctuations peut soutenir la planification logistique et les décisions commerciales. Ce travail se limite au blé et à un indicateur annuel précis.
+\section{Question de recherche}
+Dans quelle mesure les valeurs historiques de l'\textbf{indice de quantité importée de blé} permettent-elles d'anticiper sa valeur annuelle au Maroc ?
+\section{Objectif mesurable}
+Comparer une référence naïve (persistance), une régression Ridge et une forêt aléatoire. La métrique principale est l'erreur absolue moyenne (MAE) sur les dernières années, avec RMSE et $R^2$ comme métriques secondaires. L'objectif est de faire mieux que la référence naïve, sans présumer du résultat.
+\chapter{Données et préparation}
+\section{Source et périmètre}
+Les données proviennent du fichier fourni \texttt{FAOSTAT\_data\_en\_11-19-2026.csv}, issu de FAOSTAT (\url{https://www.fao.org/faostat/en/}). Le fichier brut comporte 18\,240 lignes et 14 colonnes. La sélection porte sur \textit{Morocco}, \textit{Wheat}, \textit{Import Quantity Index (2014--2016 = 100)}, entre 1961 et 2024. L'URL exacte de téléchargement et les conditions de réutilisation doivent être vérifiées avant publication.
+\textbf{Précision essentielle :} l'indicateur est un \emph{indice sans dimension}, et non une quantité exprimée en tonnes. La valeur 100 correspond à la période de base 2014--2016.
+\section{Dictionnaire des variables}
+\begin{table}[H]\centering\small\begin{tabularx}{\textwidth}{lXll}\toprule Champ & Rôle & Type & Unité\\\midrule Area & Pays déclarant & Texte & --\\ Item & Produit agricole & Texte & --\\ Element & Nature de l'indicateur & Texte & --\\ Year & Année d'observation & Entier & année\\ Value & Cible à prévoir & Réel & indice\\ Unit & Unité publiée & Texte & --\\ Flag & Indication de qualité FAOSTAT & Texte & --\\\bottomrule\end{tabularx}\caption{Dictionnaire de travail des champs FAOSTAT ; vérifier les intitulés exacts dans le CSV.}\end{table}
+Le fichier retenu n'identifie pas les partenaires bilatéraux ni les codes douaniers SH/HS ; ces variables ne sont donc pas inventées. Les valeurs manquantes, doublons annuels et anomalies doivent être examinés avant la modélisation.
+\section{Variables temporelles et absence de fuite}
+Après tri chronologique, les variables explicatives sont les valeurs retardées de 1, 2 et 3 ans. Les trois premières observations ne peuvent pas être utilisées pour ces retards : il reste 61 observations modélisables. Le calcul de chaque retard ne mobilise que les années antérieures. Les transformations sont ajustées uniquement sur l'échantillon d'entraînement.
+\chapter{Analyse exploratoire}
+\figureprojet{01_evolution.png}{Évolution annuelle de l'indice d'importation de blé au Maroc.}{La série historique présente des fluctuations marquées. Le niveau 100 représente la période de référence de l'indice et ne correspond pas à 100 tonnes.}
+\figureprojet{02_variations.png}{Variations annuelles de l'indice.}{Des hausses et baisses d'une année à l'autre indiquent une dynamique irrégulière. Les changements importants peuvent pénaliser les modèles fondés uniquement sur les retards.}
+\figureprojet{03_tendance.png}{Tendance historique et lissage descriptif.}{Le lissage facilite la lecture de la trajectoire de long terme. Il est utilisé ici pour décrire les données, et non comme variable de prévision calculée à partir d'années futures.}
+\chapter{Méthodologie de modélisation}
+\section{Référence naïve}
+La référence de persistance prévoit la dernière valeur observée :
+\begin{equation}\widehat y_t=y_{t-1}.\end{equation}
+Cette référence est simple, transparente et indispensable pour évaluer l'utilité des algorithmes plus complexes.
+\section{Régression Ridge}
+Ridge est une régression linéaire régularisée. Elle estime des coefficients $\boldsymbol\beta$ en minimisant :
+\begin{equation}\min_{\beta_0,\boldsymbol\beta}\left[\sum_{i=1}^{n}(y_i-\beta_0-\mathbf{x}_i^\top\boldsymbol\beta)^2+\alpha\lVert\boldsymbol\beta\rVert_2^2\right].\end{equation}
+Ici $y_i$ désigne l'indice observé, $\mathbf{x}_i$ les trois retards, $\beta_0$ l'ordonnée à l'origine et $\alpha$ la force de régularisation. La standardisation est réalisée dans un pipeline ajusté sur les données d'entraînement seulement.
+\section{Forêt aléatoire}
+La forêt aléatoire agrège les prédictions de plusieurs arbres de décision. Deux hyperparamètres importants sont \texttt{n\_estimators} (nombre d'arbres, ici 200) et \texttt{max\_depth} (profondeur maximale, choisie sur validation). La méthode peut capter des relations non linéaires, mais risque le surapprentissage sur une petite série annuelle.
+\section{Protocole chronologique}
+\begin{center}\fcolorbox{navy}{white}{\parbox{0.88\linewidth}{\centering\textbf{Entraînement : jusqu'à 2014}\quad$\longrightarrow$\quad\textbf{Validation : 2015--2019}\\[5pt]$\longrightarrow$\quad\textbf{Test final : 2020--2024}}}\end{center}
+Les hyperparamètres sont choisis à partir de la validation, puis le modèle retenu est réajusté sur entraînement et validation. Le test final n'est consulté qu'une fois. Il s'agit de \textbf{prévisions à un pas} utilisant les valeurs observées des années précédentes, et non de projections pluriannuelles indépendantes.
+\chapter{Résultats et interprétation}
+\section{Indicateurs de performance}
+\begin{align}\mathrm{MAE}&=\frac1n\sum_{i=1}^{n}|y_i-\widehat y_i|,\\\mathrm{RMSE}&=\sqrt{\frac1n\sum_{i=1}^{n}(y_i-\widehat y_i)^2},\\R^2&=1-\frac{\sum_i(y_i-\widehat y_i)^2}{\sum_i(y_i-\bar y)^2}.\end{align}
+\begin{table}[H]\centering\begin{tabular}{lrrr}\toprule Modèle & MAE & RMSE & $R^2$\\\midrule\textbf{Persistance ($t-1$)} & \textbf{19,20} & \textbf{21,95} & \textbf{$-3,92$}\\Forêt aléatoire & 26,91 & 28,48 & $-7,29$\\Ridge & 37,39 & 39,07 & $-14,61$\\\bottomrule\end{tabular}\caption{Résultats illustratifs sur les cinq années de test (2020--2024). MAE et RMSE en points d'indice.}\end{table}
+\figureprojet{04_predictions.png}{Comparaison des valeurs observées et prédites sur le test.}{La comparaison visuelle complète les métriques en montrant les années où les prévisions divergent des observations. Les résultats sont à reproduire à partir du notebook final.}
+\figureprojet{05_mae.png}{Comparaison des erreurs absolues moyennes.}{La référence naïve obtient la MAE la plus faible. La complexité des deux modèles supervisés n'apporte donc pas de gain sur cette fenêtre de test.}
+\figureprojet{06_residus.png}{Résidus du modèle Ridge.}{Les résidus révèlent les écarts entre observations et estimations. Leur examen aide à repérer les erreurs fortes et d'éventuels biais, sans établir de causalité.}
+\section{Discussion critique}
+Les valeurs négatives de $R^2$ signifient que les modèles sont moins performants qu'une prédiction constante égale à la moyenne du jeu de test, selon cette métrique. La fenêtre de test ne comporte que cinq années ; les scores sont donc sensibles aux chocs ponctuels et ne démontrent pas une hiérarchie robuste entre modèles.
+\chapter{Conclusion et perspectives}
+Sur la période 2020--2024, la \textbf{persistance} constitue la meilleure méthode des trois selon la MAE (19,20 points d'indice). La question de recherche reçoit ainsi une réponse nuancée : les valeurs passées permettent de construire des prévisions, mais les modèles plus sophistiqués ne dépassent pas nécessairement la référence simple.
+Les limites principales sont la petite taille du test, l'absence de facteurs explicatifs externes (récoltes, précipitations, prix mondiaux, décisions publiques) et la nature indicielle de la cible. Des validations glissantes sur plusieurs fenêtres et l'ajout de variables économiques disponibles à la date de prévision pourraient améliorer la robustesse.
+\chapter*{Reproductibilité et déclaration}\addcontentsline{toc}{chapter}{Reproductibilité et déclaration}
+Graine aléatoire : 42. Séparation chronologique. Données originales conservées. Ce rapport est une version de préparation avec assistance IA ; l'étudiante doit contrôler les calculs, déclarer l'utilisation de l'IA et respecter la consigne de rédaction du code pendant la séance d'évaluation.
+\chapter*{Références}\addcontentsline{toc}{chapter}{Références}
+\begin{enumerate}[label={[\arabic*]}]\item FAO, \emph{FAOSTAT}, \url{https://www.fao.org/faostat/en/}.\item A. Larhlimi, \emph{Contrôle continu -- Partie B : Machine Learning appliqué au commerce international}, ENCG Settat, 2026--2027.\item Fichier de données fourni : \texttt{FAOSTAT\_data\_en\_11-19-2026.csv}.\end{enumerate}
+\end{document}
