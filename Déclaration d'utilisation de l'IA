@@ -1,0 +1,26 @@
+# Déclaration d'utilisation de l'IA
+
+**Étudiant :** Ahnnaou Youness (23009126) · ENCG Settat · S7 · 2026–2027
+**Projet :** CI02 — Prévision de l'indice des quantités de blé importées au Maroc
+
+## Outils utilisés
+- [Nom de l'outil, ex. Claude (Anthropic)] et [autres outils éventuels, ex. ChatGPT]
+
+## Usages déclarés
+- Aide au choix du sujet et au cadrage du périmètre (Maroc, blé, série annuelle).
+- Aide à la planification des étapes du projet et à la liste des livrables.
+- [Aide à la rédaction / à la correction du code du notebook : préciser quelles parties.]
+- Aide à la structuration de la présentation de 6 diapositives et à la rédaction du script de la vidéo.
+
+## Ce qui relève de mon travail personnel
+- [Choix des données FAOSTAT, filtrage et vérification des valeurs.]
+- Exécution du notebook de bout en bout et lecture des résultats produits par le code.
+- [Interprétation des figures et rédaction des conclusions et limites.]
+
+## Vérification
+J'ai relu et exécuté l'ensemble du code. Les métriques présentées proviennent de l'exécution du notebook, sans valeur inventée. Je suis en mesure d'expliquer chaque étape, y compris le découpage chronologique, le choix d'alpha sur la validation et les limites des résultats.
+
+## Limites de cette déclaration
+[Ajouter ici tout autre usage de l'IA non listé ci-dessus.]
+
+Date : [jj/mm/aaaa] · Signature : Ahnnaou Youness
