@@ -1,0 +1,480 @@
+% =====================================================================
+%  RAPPORT À COMPLÉTER
+%  Examen individuel (Partie B) : projet de science des données
+%  appliqué à la finance. S7 FIN et CI, cours BD & DS, ENCG-2026.
+%
+%  Mode d'emploi
+%  1. Remplacez chaque \acompleter{...} (texte rouge) et chaque
+%     \acel{...} (cellule rouge) par votre contenu. Rien ne doit rester
+%     en rouge dans la version remise. Après chaque compilation, le
+%     journal indique le nombre d'éléments qui restent à compléter.
+%  2. Compilez avec pdfLaTeX (sur Overleaf : compilateur pdfLaTeX).
+%     Compilez deux fois pour mettre à jour les renvois et les citations.
+%  3. Les figures sont cherchées dans ../figures/ puis dans figures/.
+%     Tant qu'une figure manque, un cadre la remplace : le document
+%     compile toujours. Sur Overleaf, créez un dossier figures/ et
+%     téléversez-y vos images.
+%  4. Citations : chaque source de la liste « Références et citations »
+%     a une clé (par exemple lie1). Citez-la dans le texte avec \cite{lie1}.
+%  5. Longueur : celle fixée par l'énoncé. Les lignes qui commencent
+%     par % sont des aides : vous pouvez les supprimer.
+%  6. Caractères spéciaux : écrivez \_ pour un tiret bas (par exemple
+%     \texttt{n\_estimators}), \% pour un pourcentage, \& pour &.
+%  7. Page de garde : les logos de l'Université Hassan 1er
+%     (logo_universite_hassan1.png) et de l'ENCG Settat
+%     (logo_encg_settat.png) sont fournis : laissez-les à côté de
+%     rapport.tex (ou dans figures/).
+%  8. Votre photo (format identité) : placez-la à côté de rapport.tex,
+%     nommée photo_etudiant.jpg ou photo_etudiant.png. Elle remplace
+%     automatiquement la photo modèle (photo_modele.png), qui s'affiche
+%     en attendant avec la mention « Remplacez par votre photo ».
+%  9. Lien GitHub : remplacez l'adresse dans la commande \lienDepot
+%     ci-dessous (une seule fois). Il s'affiche sur la page de garde et
+%     en annexe, en rouge tant qu'il n'est pas modifié.
+% 10. Remettez rapport.tex, rapport.pdf, les deux logos et votre photo
+%     dans le dossier rapport/ de votre dépôt CodeApogee-Nom-Groupe.
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[french]{babel}
+\frenchsetup{StandardLists=true}
+\usepackage[margin=1.8cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[labelsep=colon]{caption}
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[hidelinks]{hyperref}
+
+% ========== Mise en page et commandes du gabarit (ne pas modifier) ==========
+\addto\captionsfrench{%
+  \renewcommand{\tablename}{Tableau}%
+  \renewcommand{\refname}{Références et citations}}
+\setlist{itemsep=1pt,topsep=3pt}
+\setlength{\emergencystretch}{2em}
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+  {1.2ex \@plus 0.4ex \@minus 0.2ex}{-1em}{\normalfont\normalsize\bfseries}}
+\makeatother
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\newcounter{nbacompleter}
+\DeclareRobustCommand{\acompleter}[1]{%
+  \stepcounter{nbacompleter}\textcolor{red}{\textit{[À compléter : #1]}}}
+\DeclareRobustCommand{\acel}[1]{%
+  \stepcounter{nbacompleter}\textcolor{red}{\textit{#1}}}
+% \insererfigure{fichier}{légende}{étiquette}
+\newcommand{\insererfigure}[3]{%
+  \begin{figure}[htbp]
+    \centering
+    \IfFileExists{../figures/#1}{\includegraphics[width=0.62\linewidth]{../figures/#1}}{%
+      \IfFileExists{figures/#1}{\includegraphics[width=0.62\linewidth]{figures/#1}}{%
+        \fbox{\parbox[c][2.4cm][c]{0.6\linewidth}{\centering\small
+          Figure à insérer : \texttt{figures/\detokenize{#1}}}}}}
+    \caption{#2}
+    \label{#3}
+  \end{figure}}
+% ---------- VOTRE LIEN GITHUB : remplacez l'adresse ci-dessous ----------
+\newcommand{\lienDepot}{https://github.com/AHNNAOU-YOUNESS/23009126-AHNNAOU-YOUNESS-CI.git}
+% -------------------------------------------------------------------------
+\newcommand{\lienParDefaut}{https://github.com/identifiant/CodeApogee-Nom-Groupe}
+\newcommand{\afficherlien}{%
+  \ifx\lienDepot\lienParDefaut
+    \stepcounter{nbacompleter}\textcolor{red}{\expandafter\url\expandafter{\lienDepot}}%
+  \else
+    \expandafter\url\expandafter{\lienDepot}%
+  \fi}
+% Photo de l'étudiant(e) : photo_etudiant.jpg ou photo_etudiant.png.
+% Tant qu'elle manque, la photo modèle (photo_modele.png) s'affiche avec la
+% mention « Remplacez par votre photo », et compte comme élément à compléter.
+\newcommand{\photo}[1]{\includegraphics[width=3.5cm,height=4.5cm,keepaspectratio]{#1}}
+\newcommand{\insererphoto}{%
+  \IfFileExists{photo_etudiant.jpg}{\photo{photo_etudiant.jpg}}{%
+    \IfFileExists{photo_etudiant.png}{\photo{photo_etudiant.png}}{%
+    \IfFileExists{photo_modele.png}{\stepcounter{nbacompleter}\photo{photo_modele.png}\\[3pt]%
+      {\scriptsize\textcolor{red}{\textit{Remplacez par votre photo}}}}{%
+      \fbox{\parbox[c][4.5cm][c]{3.5cm}{\centering\small\textcolor{red}{\textit{Photo de\\ l'étudiant(e)}}\\[4pt]
+        \scriptsize\texttt{photo\_etudiant.jpg}}}}}}}
+% Logos de la page de garde : déposez les deux fichiers à côté de rapport.tex
+% (ou dans figures/). Modifiez les noms ci-dessous si vos fichiers s'appellent autrement.
+\newcommand{\fichierlogouniv}{logo_universite_hassan1.png}
+\newcommand{\fichierlogo}{logo_encg_settat.png}
+% \chercherimage{fichier}{options}{largeur du cadre}{hauteur du cadre}{texte du cadre}
+\newcommand{\chercherimage}[5]{%
+  \IfFileExists{#1}{\includegraphics[#2]{#1}}{%
+    \IfFileExists{figures/#1}{\includegraphics[#2]{figures/#1}}{%
+      \IfFileExists{../figures/#1}{\includegraphics[#2]{../figures/#1}}{%
+        \fbox{\parbox[c][#4][c]{#3}{\centering\small #5\\[2pt]
+          \tiny\texttt{\detokenize\expandafter{#1}}}}}}}}
+\newcommand{\insererlogouniv}{\chercherimage{\fichierlogouniv}{height=1.9cm}{5.2cm}{1.9cm}{Logo de l'Université Hassan 1\ier}}
+\newcommand{\insererlogo}{\chercherimage{\fichierlogo}{height=2.5cm}{2.5cm}{2.5cm}{Logo de l'ENCG Settat}}
+\AtEndDocument{\ifnum\value{nbacompleter}>0
+  \typeout{ATTENTION : il reste \arabic{nbacompleter} élément(s) à compléter.}\fi}
+% ===========================================================================
+
+\begin{document}
+
+% =====================================================================
+%  PAGE DE GARDE (non comptée dans la longueur du rapport)
+% =====================================================================
+\begin{titlepage}
+  \centering
+  % Logos : Université Hassan 1er à gauche, ENCG Settat à droite
+  \noindent
+  \begin{minipage}[c]{0.5\linewidth}\raggedright\insererlogouniv\end{minipage}%
+  \begin{minipage}[c]{0.5\linewidth}\raggedleft\insererlogo\end{minipage}\par
+  \vspace{0.9cm}
+  {\large Université Hassan 1\ier{} de Settat}\par
+  \vspace{0.2cm}
+  {\Large\bfseries École Nationale de Commerce et de Gestion de Settat}\par
+  \vspace{0.1cm}
+  {\large ENCG Settat}\par
+  \vspace{1.6cm}
+  \rule{\linewidth}{0.8pt}\par
+  \vspace{0.5cm}
+  {\large Cours BD \& DS : examen individuel (Partie B)}\par
+  \vspace{0.3cm}
+  {\Large Rapport de projet de science des données appliquée à la finance}\par
+  \vspace{0.7cm}
+  {\LARGE\bfseries\textcolor{red}{CI02 : prévision de l'indice des quantités de blé importées au Maroc}}\par
+  \vspace{0.5cm}
+  \rule{\linewidth}{0.8pt}\par
+  \vfill
+  \begin{minipage}[c]{0.66\linewidth}
+  \large
+  \begin{tabular}{@{}ll@{}}
+    Réalisé par          & AHNNAOU Youness \\[3pt]
+    Code Apogée          & 23009126 \\[3pt]
+    Groupe et filière    & \acel{groupe}, S7 CI (Commerce International) \\[3pt]
+    Algorithme principal & Régression Ridge \\[3pt]
+    Enseignant        & {A. Larhlimi} \\[3pt]
+  \end{tabular}
+  \end{minipage}\hfill
+  \begin{minipage}[c]{0.3\linewidth}
+    \centering\insererphoto
+  \end{minipage}\par
+  \vspace{0.8cm}
+  {\large\textbf{Dépôt GitHub :} \afficherlien}\par
+  \vfill
+  {\large Année universitaire 2026-2027}\par
+  \vspace{0.2cm}
+  Remis le \today
+\end{titlepage}
+
+% =====================================================================
+\section{Introduction}
+\label{sec:introduction}
+% =====================================================================
+\paragraph{Contexte.} Le Maroc importe une grande partie du blé qu'il consomme. Savoir à l'avance combien il va en importer aide à préparer les stocks, les devises et l'activité des ports. Ce type de prévision peut servir à ceux qui planifient les approvisionnements.
+
+\paragraph{Problématique.} Comment prévoir l'évolution des quantités annuelles de blé importées par le Maroc à partir de l'historique des échanges ?
+
+\paragraph{Objectif mesurable.} Mesurer l'erreur moyenne (MAE) et la RMSE sur la période de test 2015--2024. Le seuil de réussite, fixé avant les résultats, est de faire mieux que la référence naïve (la valeur de l'année précédente) sur ces deux mesures.
+
+\paragraph{Nature du problème.} C'est une régression sur une série temporelle : on prévoit un nombre (un indice annuel) à partir de ses valeurs passées. Cet indice a pour base 100 la moyenne 2014--2016 ; ce n'est donc pas un tonnage, et les erreurs sont en points d'indice.
+
+\paragraph{Organisation du rapport.} La section~\ref{sec:etat} présente l'état de l'art et la section~\ref{sec:travaux} les travaux liés. Les sections~\ref{sec:donnees} à~\ref{sec:protocole} décrivent les données, leur exploration, leur préparation, l'algorithme retenu et le protocole expérimental. La section~\ref{sec:resultats} présente les résultats, discutés en section~\ref{sec:discussion}, avant la conclusion (section~\ref{sec:conclusion}).
+
+% =====================================================================
+\section{État de l'art}
+\label{sec:etat}
+% =====================================================================
+Pour prévoir une série annuelle courte, on compare en général trois types de méthodes. La référence naïve reprend la dernière valeur connue et sert de point de comparaison \cite{etat1}. Les méthodes classiques, comme ARIMA \cite{etat2} ou la régression Ridge \cite{etat3}, s'appuient sur le passé de la série. L'apprentissage automatique, par exemple les forêts aléatoires \cite{etat4}, a aussi été testé sur des importations alimentaires \cite{etat5}. Une grande comparaison montre que les méthodes plus complexes ne gagnent pas toujours \cite{lie1}.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Panorama des approches pour ce type de problème}
+  \label{tab:etat}
+  \small
+  \begin{tabular}{@{}P{3cm} P{4.3cm} P{3.5cm} P{3.5cm} l@{}}
+    \toprule
+    Approche & Principe & Atouts & Limites & Réf. \\
+    \midrule
+    Référence naïve & Reprendre la dernière valeur & Simple, sans paramètre & Rate les retournements & \cite{etat1} \\
+    Approche classique (ARIMA, Ridge) & Modèle linéaire du passé de la série & Peu de paramètres, facile à lire & Suppose une relation linéaire et stable & \cite{etat2,etat3} \\
+    Apprentissage automatique & Modèle non linéaire appris sur les données & Capte des relations plus complexes & Demande plus de données ; les arbres ne sortent pas de l'intervalle vu & \cite{etat4,etat5} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% =====================================================================
+\section{Travaux liés}
+\label{sec:travaux}
+% =====================================================================
+\begin{table}[htbp]
+  \centering
+  \caption{Travaux liés}
+  \label{tab:travaux}
+  \small
+  \begin{tabular}{@{}P{2.4cm} P{2.8cm} P{2.8cm} P{3.4cm} P{3.8cm}@{}}
+    \toprule
+    Travail & Données & Méthode & Résultat principal & Différence avec ce travail \\
+    \midrule
+    Makridakis et al., 2018 \cite{lie1} & 1045 séries mensuelles (compétition M3) & Apprentissage automatique contre huit méthodes statistiques & Les méthodes statistiques font mieux, à tous les horizons & Ici, une seule série annuelle d'importations de blé \\
+    Latifi et Shabanali Fami, 2022 \cite{lie2} & Production de blé en Iran, avec précipitations, engrais, population et surface cultivée & ARIMA contre réseau de neurones & Le réseau de neurones a une erreur plus faible (RMSE de 0,391) & Ici, des importations, sans variable externe \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Positionnement.} Je reprends l'idée de ces études : comparer chaque modèle à une référence simple et ne pas se fier à un seul découpage. Le travail apporte un cas concret sur les importations de blé du Maroc, avec des données FAOSTAT et un protocole sans fuite d'information.
+
+% =====================================================================
+\section{Jeu de données}
+\label{sec:donnees}
+% =====================================================================
+\begin{itemize}
+  \item \textbf{Nom et source :} FAOSTAT, domaine \emph{Trade Indices}, FAO \cite{donnees}, \url{https://www.fao.org/faostat/en/#data/TI}
+  \item \textbf{Date d'extraction :} 19/11/2026
+  \item \textbf{Licence ou conditions d'utilisation :} non précisée dans l'export ; voir les conditions d'utilisation de la FAO.
+  \item \textbf{Taille :} 64 observations et 6 colonnes retenues (14 dans l'export de 18\,240 lignes), de 1961 à 2024, fréquence annuelle.
+  \item \textbf{Unité d'observation :} une année, pour l'indice des quantités de blé importées par le Maroc.
+  \item \textbf{Variable cible :} \texttt{Value}, l'indice de l'année $t$ (base 100 = 2014--2016).
+  \item \textbf{Adéquation :} série officielle et longue, qui mesure ce que l'on veut prévoir.
+  \item \textbf{Limites :} série courte, indice et non tonnage, aucune variable explicative. Aucune valeur manquante ni année en double.
+\end{itemize}
+
+\begin{table}[htbp]
+  \centering
+  \caption{Dictionnaire des principales variables}
+  \label{tab:dictionnaire}
+  \small
+  \begin{tabular}{@{}l P{4.4cm} l P{2.6cm} l c@{}}
+    \toprule
+    Variable & Description & Type & Unité & Rôle & Manquants (\%) \\
+    \midrule
+    \texttt{Year} & Année d'observation & entier & année & date & 0 \\
+    \texttt{Value} & Indice des quantités de blé importées & numérique & indice (2014--2016 = 100) & cible & 0 \\
+    \texttt{lag1} & Indice de l'année précédente & numérique & indice & explicative & 0 \\
+    \texttt{lag2} & Indice d'il y a deux ans & numérique & indice & explicative & 0 \\
+    \texttt{lag3} & Indice d'il y a trois ans & numérique & indice & explicative & 0 \\
+    \texttt{variation\_pct} & Variation annuelle en \% (description seulement) & numérique & \% & exploration & 1,6 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% =====================================================================
+\section{Exploration}
+\label{sec:exploration}
+% =====================================================================
+\paragraph{Statistiques descriptives.} Sur 64 années, l'indice vaut en moyenne 47,6 (écart-type 32,4). Le minimum est 2 (1963) et le maximum 129 (2016). La médiane est 43.
+
+\paragraph{Qualité des données.} Le filtre renvoie 64 lignes, sans valeur manquante ni année en double ; le notebook le vérifie. Je n'ai rien supprimé ni corrigé : les années extrêmes, comme 2016, viennent d'une statistique officielle et restent plausibles pour des importations qui varient beaucoup.
+
+\insererfigure{fig1_description.png}{Évolution de l'indice des quantités de blé importées par le Maroc (1961--2024)}{fig:1}
+
+\noindent\textbf{Lecture de la figure~\ref{fig:1}.} L'indice monte sur le long terme : moins de 20 dans les années 1960, autour de 100 ou plus depuis 2020. Les à-coups sont de plus en plus marqués, avec des sommets en 2016 (129) et 2022 (123).
+
+\insererfigure{fig2_description.png}{Variation annuelle de l'indice (en \%)}{fig:2}
+
+\noindent\textbf{Lecture de la figure~\ref{fig:2}.} Les variations sont énormes dans les années 1960 et 1970, mais elles partent d'un niveau très bas. Elles restent fortes ensuite : $+89$~\% en 2014, $-38$~\% en 2015, $+96$~\% en 2016, $-43$~\% en 2017. La série est donc volatile, ce qui rend la prévision difficile. La moyenne mobile sur 5 ans est en annexe~\ref{ann:complements}.
+
+% =====================================================================
+\section{Préparation}
+\label{sec:preparation}
+% =====================================================================
+\begin{itemize}
+  \item \textbf{Nettoyage :} filtre sur le Maroc, le blé et l'indice de quantité importée, conversion en nombres, tri par année. Pas d'imputation, car rien ne manque.
+  \item \textbf{Variables créées :} trois retards (\texttt{lag1}, \texttt{lag2}, \texttt{lag3}), obtenus en décalant la série (tableau~\ref{tab:dictionnaire}). Les trois premières années disparaissent : il reste 61 observations.
+  \item \textbf{Encodage et mise à l'échelle :} pas d'encodage, tout est numérique. Les retards sont standardisés pour Ridge, dans un \texttt{Pipeline} ; la forêt aléatoire n'en a pas besoin.
+\end{itemize}
+
+\paragraph{Prévention des fuites.}
+\begin{itemize}
+  \item[$\boxtimes$] Transformations ajustées sur l'apprentissage seulement, dans un \texttt{Pipeline}.
+  \item[$\boxtimes$] Découpage chronologique, sans mélange (données datées).
+  \item[$\boxtimes$] Variables construites avec le passé seulement ; on prévoit un an à l'avance, donc aucun écart supplémentaire.
+  \item[$\boxtimes$] Aucune variable ne contient la cible, même indirectement.
+  \item[$\boxtimes$] Jeu de test utilisé une seule fois, à la fin.
+\end{itemize}
+Pour vérifier l'alignement des dates, j'affiche les bornes de chaque période (1964--2005, 2006--2014, 2015--2024). Le tableau~\ref{tab:illustration} montre aussi que la prévision naïve de 2016 (66) est bien la valeur réelle de 2015.
+
+% =====================================================================
+\section{Algorithme}
+\label{sec:algorithme}
+% =====================================================================
+\paragraph{Choix.} J'ai retenu la régression Ridge. Les trois retards se ressemblent beaucoup, ce qui rend une régression ordinaire instable ; Ridge calme ce problème en freinant les coefficients \cite{etat3}. Avec 64 années seulement, un modèle simple est aussi plus prudent. La forêt aléatoire sert de modèle de comparaison. Je n'ai pas testé ARIMA \cite{etat2}, qui reste une piste.
+
+\paragraph{Principe.} Ridge prévoit l'indice d'une année comme une somme pondérée des trois années précédentes. Pendant l'apprentissage, il cherche les poids qui donnent les erreurs les plus faibles, tout en gardant ces poids raisonnables. J'utilise \texttt{Ridge} de scikit-learn \cite{sklearn}, vu dans le cours \cite{support}.
+
+\paragraph{Formule essentielle.}
+\begin{equation}
+  \hat{y}_t = \beta_0 + \beta_1\, y_{t-1} + \beta_2\, y_{t-2} + \beta_3\, y_{t-3}
+  \label{eq:principale}
+\end{equation}
+où $\hat{y}_t$ est la prévision de l'année $t$, $y_{t-k}$ l'indice observé $k$ années plus tôt, $\beta_0$ une constante et $\beta_k$ le poids du retard $k$.
+
+\paragraph{Paramètres appris.} Les poids $\beta_0$ à $\beta_3$ de l'équation~\eqref{eq:principale}, estimés sur les données d'apprentissage.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Hyperparamètres étudiés}
+  \label{tab:hyper}
+  \small
+  \begin{tabular}{@{}P{3.6cm} P{5.8cm} P{3.2cm} l@{}}
+    \toprule
+    Hyperparamètre & Rôle et effet attendu & Valeurs testées & Valeur retenue \\
+    \midrule
+    $\alpha$ (Ridge) & Force du frein sur les poids : plus il est grand, plus les poids sont petits & 0,1 ; 1 ; 10 ; 100 & 0,1 \\
+    \texttt{n\_estimators}, \texttt{max\_depth} (forêt) & Nombre et profondeur des arbres, fixés sans optimisation & aucune (fixés) & 200 ; 4 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% =====================================================================
+\section{Protocole expérimental}
+\label{sec:protocole}
+% =====================================================================
+\begin{table}[htbp]
+  \centering
+  \caption{Découpage des données}
+  \label{tab:decoupage}
+  \small
+  \begin{tabular}{@{}l l r@{}}
+    \toprule
+    Ensemble & Période ou proportion & Observations \\
+    \midrule
+    Apprentissage & 1964--2005 (70 \%) & 42 \\
+    Validation & 2006--2014 (15 \%), validation simple & 9 \\
+    Test & 2015--2024 (15 \%) & 10 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{itemize}
+  \item \textbf{Référence naïve :} prévoir la valeur de l'année précédente. C'est le seuil à battre \cite{etat1}.
+  \item \textbf{Validation :} un seul découpage chronologique (2006--2014), 4 configurations essayées. Le modèle final est ensuite réentraîné sur apprentissage et validation, puis évalué une seule fois sur le test.
+  \item \textbf{Métrique principale :} MAE, l'erreur moyenne en points d'indice. Elle se lit directement \cite{metrique}.
+  \item \textbf{Métriques secondaires :} RMSE, qui pèse plus les grosses erreurs, et $R^2$, qui compare au simple fait de prévoir la moyenne du test.
+  \item \textbf{Graine aléatoire :} 42.
+\end{itemize}
+
+% =====================================================================
+\section{Résultats}
+\label{sec:resultats}
+% =====================================================================
+\begin{table}[htbp]
+  \centering
+  \caption{Comparaison de la référence naïve et des modèles (points d'indice)}
+  \label{tab:resultats}
+  \small
+  \begin{tabular}{@{}l cc cc@{}}
+    \toprule
+    & \multicolumn{2}{c}{MAE} & \multicolumn{2}{c}{RMSE} \\
+    \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+    Modèle & Validation & Test & Validation & Test \\
+    \midrule
+    Référence : année précédente & n.c. & 25,90 & n.c. & 33,21 \\
+    Ridge ($\alpha = 0{,}1$) & 19,18 & \textbf{22,47} & n.c. & \textbf{28,59} \\
+    Forêt aléatoire & n.c. & 23,65 & n.c. & 29,64 \\
+    \bottomrule
+  \end{tabular}
+
+  \smallskip
+  {\footnotesize n.c. : non calculé dans le notebook (la validation sert à choisir $\alpha$). $R^2$ sur le test : $-0{,}75$ (Ridge), $-0{,}88$ (forêt), $-1{,}36$ (référence).}
+\end{table}
+
+\insererfigure{fig3_description.png}{Valeurs réelles et prévisions sur le test (2015--2024)}{fig:3}
+
+\paragraph{Lecture des résultats.} Sur le test, Ridge a une MAE de 22,47 contre 25,90 pour la référence, soit environ 13~\% de moins. Sa RMSE baisse d'environ 14~\% (28,59 contre 33,21). La forêt est entre les deux. Sur la figure~\ref{fig:3}, la forêt reste presque plate (entre 72 et 83), la référence a un an de retard et Ridge suit mieux le niveau général.
+
+\paragraph{Analyse des erreurs.} Ridge se trompe surtout en 2016 (129 réel, 69,96 prévu, soit 59,04 d'écart), puis en 2017 (35,30), 2020 (33,90) et 2022 (30,72). Il est très proche du réel quand la série bouge peu : 2,13 en 2018, 3,53 en 2021. Les erreurs viennent donc des changements brusques.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Prédictions sur des observations non utilisées pour l'apprentissage}
+  \label{tab:illustration}
+  \small
+  \begin{tabular}{@{}l l l P{7cm}@{}}
+    \toprule
+    Observation & Prédiction (Ridge) & Valeur réelle & Commentaire \\
+    \midrule
+    2016 & 69,96 & 129 & Pic non anticipé, 59,04 d'écart ; la référence prévoit 66 \\
+    2018 & 81,13 & 79 & Année stable : très proche du réel \\
+    2019 & 106,32 & 79 & Surestimation de 27,32 : le modèle suit la hausse récente, l'indice reste stable \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% =====================================================================
+\section{Discussion des résultats}
+\label{sec:discussion}
+% =====================================================================
+\paragraph{Réponse à l'objectif.} L'objectif est atteint : Ridge bat la référence en MAE (22,47 contre 25,90) et en RMSE (28,59 contre 33,21).
+
+\paragraph{Interprétation.} La référence naïve recopie l'année précédente, donc elle rate les retournements. La forêt ne prévoit pas au-delà des valeurs vues à l'entraînement, alors que l'indice a beaucoup monté. Ridge, linéaire, suit mieux la tendance. Les trois $R^2$ sont pourtant négatifs : aucun modèle ne fait mieux que prévoir la moyenne du test. Le gain de Ridge est réel mais modeste. Je n'ai pas analysé les poids appris, et rien ne permet de parler de causalité.
+
+\paragraph{Surapprentissage et généralisation.} La MAE de Ridge est de 19,18 en validation et de 22,47 en test, soit 3,3 points de plus : la période de test paraît plus difficile. Je n'ai pas calculé le score d'apprentissage ni testé d'autres graines ou périodes.
+
+\paragraph{Comparaison avec les travaux liés.} Mon résultat va dans le sens de \cite{lie1} : un modèle simple fait mieux qu'une forêt sur une série courte, mais seulement pour ce découpage. La comparaison avec \cite{lie2} n'est pas directe : leur réseau de neurones utilise des variables externes et prévoit la production, pas les importations.
+
+\paragraph{Limites et biais.} Le test ne compte que 10 années : l'écart de 3,4 points entre Ridge et la référence pourrait changer avec une autre période. Les chocs climatiques et commerciaux ne sont pas pris en compte, et la cible est un indice, pas un volume.
+
+\paragraph{Pistes d'amélioration.} (1) Ajouter des variables externes comme les précipitations, la production nationale et les prix mondiaux. (2) Tester plusieurs périodes de test successives (\texttt{TimeSeriesSplit}) et un modèle ARIMA.
+
+% =====================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+% =====================================================================
+Pour prévoir les importations de blé du Maroc, Ridge sur trois retards est le meilleur modèle comparé : 22,47 points d'indice d'erreur moyenne, contre 25,90 pour la référence naïve. L'avantage reste modeste et les $R^2$ négatifs montrent que l'historique seul ne suffit pas. La prévision pour 2025, autour de 120,3 points d'indice, est un ordre de grandeur incertain. Prochaine étape : ajouter des variables externes et tester d'autres périodes.
+
+% =====================================================================
+%  RÉFÉRENCES ET CITATIONS
+% =====================================================================
+\begin{thebibliography}{99}
+  \bibitem{donnees} FAO, « FAOSTAT : Trade Indices », Organisation des Nations unies pour l'alimentation et l'agriculture, \url{https://www.fao.org/faostat/en/#data/TI}, export CSV du 19/11/2026.
+  \bibitem{etat1} R.~J. Hyndman et G.~Athanasopoulos, \textit{Forecasting: Principles and Practice}, 3\textsuperscript{e} éd., OTexts, 2021.
+  \bibitem{etat2} G.~E.~P. Box, G.~M. Jenkins, G.~C. Reinsel et G.~M. Ljung, \textit{Time Series Analysis: Forecasting and Control}, 5\textsuperscript{e} éd., Wiley, 2015.
+  \bibitem{etat3} A.~E. Hoerl et R.~W. Kennard, « Ridge Regression: Biased Estimation for Nonorthogonal Problems », \textit{Technometrics}, vol.~12, n\textsuperscript{o}~1, p.~55-67, 1970.
+  \bibitem{etat4} L.~Breiman, « Random Forests », \textit{Machine Learning}, vol.~45, n\textsuperscript{o}~1, p.~5-32, 2001.
+  \bibitem{etat5} C.~Mio et S.~Shakya, « A Comparison of Advanced Machine Learning Models for Food Import Forecasting », SCITEPRESS, 2024, DOI 10.5220/0012998100003837.
+  \bibitem{metrique} R.~J. Hyndman et A.~B. Koehler, « Another look at measures of forecast accuracy », \textit{International Journal of Forecasting}, vol.~22, n\textsuperscript{o}~4, p.~679-688, 2006.
+  \bibitem{lie1} S.~Makridakis, E.~Spiliotis et V.~Assimakopoulos, « Statistical and Machine Learning forecasting methods: Concerns and ways forward », \textit{PLOS ONE}, vol.~13, n\textsuperscript{o}~3, e0194889, 2018, \url{https://doi.org/10.1371/journal.pone.0194889}.
+  \bibitem{lie2} Z.~Latifi et H.~Shabanali Fami, « Forecasting Wheat Production in Iran Using Time Series Technique and Artificial Neural Network », \textit{Journal of Agricultural Science and Technology}, vol.~24, n\textsuperscript{o}~2, p.~261-273, 2022, \url{https://journals.modares.ac.ir/article_16630.html}.
+  \bibitem{sklearn} F.~Pedregosa \textit{et al.}, « Scikit-learn: Machine Learning in Python », \textit{Journal of Machine Learning Research}, vol.~12, p.~2825-2830, 2011.
+  \bibitem{support} Support du cours BD \& DS, notebook \texttt{Tp\_ML.ipynb}, ENCG-2026.
+\end{thebibliography}
+
+% =====================================================================
+%  ANNEXES
+% =====================================================================
+\appendix
+
+\section{Reproduction}
+\label{ann:reproduction}
+Version corrigée : étiquette \texttt{remise-finale} du dépôt \afficherlien.
+\begin{enumerate}
+  \item Cloner le dépôt : \texttt{git clone} suivi du lien ci-dessus.
+  \item Installer les dépendances : \texttt{pip install -r requirements.txt}.
+  \item Exécuter \texttt{notebooks/CI02\_23009126.ipynb} avec « Redémarrer et tout exécuter ».
+\end{enumerate}
+
+\section{Tableaux et figures complémentaires}
+\label{ann:complements}
+\insererfigure{fig4_tendance.png}{Indice observé et moyenne mobile sur 5 ans (description seulement, non utilisée par le modèle)}{fig:4}
+
+La moyenne mobile confirme la tendance à la hausse et lisse les à-coups d'une année à l'autre.
+
+\section{Déclaration des outils d'IA}
+\label{ann:ia}
+\begin{table}[htbp]
+  \centering
+  \caption{Ressources et outils d'IA utilisés}
+  \label{tab:ia}
+  \small
+  \begin{tabular}{@{}P{3cm} P{4.8cm} P{3.3cm} P{4.4cm}@{}}
+    \toprule
+    Outil ou ressource & Usage précis & Parties concernées & Vérification effectuée \\
+    \midrule
+    Claude (Anthropic), novembre 2026 & Aide à la mise en forme du rapport LaTeX, de la présentation et du README, et à la rédaction des interprétations à partir des résultats du notebook & Rapport, présentation, README & Valeurs recoupées avec les sorties du notebook exécuté ; relecture par l'étudiant \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\noindent\textbf{En bref.} Une IA (Claude) m'a aidé à cadrer le sujet, à organiser les étapes et à préparer les livrables (rapport, présentation, script de la vidéo, README). Les chiffres du rapport viennent de l'exécution du notebook ; je les ai relus et je peux expliquer chaque étape. Détail complet dans \texttt{DECLARATION\_IA.md}.
+
+\end{document}
